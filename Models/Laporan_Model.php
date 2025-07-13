@@ -205,6 +205,48 @@ public function getAllLaporanDiterimaFiltered($start = null, $end = null, $type 
 
     return $this->db->execute($sql);
 }
+public function getLaporanByUserFiltered($user_id, $tanggal_mulai = null, $tanggal_akhir = null, $status = null, $jenis = null) {
+    $sql = "SELECT r.*, 
+                   a.name AS area_name,
+                   p.name AS pupuk_name,
+                   ps.name AS pesticide_name,
+                   GROUP_CONCAT(t.name SEPARATOR ', ') AS tools
+            FROM reports r
+            JOIN areas a ON r.area_id = a.id
+            LEFT JOIN pupuks p ON r.pupuk_id = p.id
+            LEFT JOIN pesticides ps ON r.pesticide_id = ps.id
+            LEFT JOIN report_tools rt ON r.id = rt.report_id
+            LEFT JOIN tools t ON rt.tool_id = t.id
+            WHERE r.employee_id = $user_id";
+
+    if ($tanggal_mulai) {
+        $sql .= " AND DATE(r.datetime) >= '$tanggal_mulai'";
+    }
+
+    if ($tanggal_akhir) {
+        $sql .= " AND DATE(r.datetime) <= '$tanggal_akhir'";
+    }
+
+    if ($status && in_array($status, ['diterima', 'ditolak', 'pending'])) {
+        $sql .= " AND r.status = '$status'";
+    }
+
+    if ($jenis && in_array($jenis, ['panen', 'pupuk', 'nyemprot', 'pupuk&nyemprot'])) {
+        $sql .= " AND r.type = '$jenis'";
+    }
+
+    $sql .= " GROUP BY r.id ORDER BY r.datetime DESC";
+
+    $result = $this->db->execute($sql);
+
+    $grouped = ['panen' => [], 'pupuk' => [], 'nyemprot' => [], 'pupuk&nyemprot' => []];
+    foreach ($result as $r) {
+        $grouped[$r['type']][] = $r;
+    }
+
+    return $grouped;
+}
+
 
 
 }
