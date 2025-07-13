@@ -21,7 +21,7 @@
                 <option value="panen" <?= $_GET['type'] ?? '' === 'panen' ? 'selected' : '' ?>>Panen</option>
                 <option value="pupuk" <?= $_GET['type'] ?? '' === 'pupuk' ? 'selected' : '' ?>>Pemupukan</option>
                 <option value="nyemprot" <?= $_GET['type'] ?? '' === 'nyemprot' ? 'selected' : '' ?>>Penyemprotan</option>
-                <option value="pupuk&nyemprot" <?= $_GET['type'] ?? '' === 'pupuk&nyemprot' ? 'selected' : '' ?>>Pupuk & Nyemprot</option>
+            
             </select>
         </div>
 
